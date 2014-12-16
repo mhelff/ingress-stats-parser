@@ -131,6 +131,7 @@ hd[MTLM]="Max Time Link Maintained"
 hd[MLLD]="Max Link Length x Days"
 hd[MTFH]="Max Time Field Held"
 hd[LFMD]="Largest Field MUs x Days"
+hd[MODDEP]="Mods Deployed"
 
 echoStatsInternal "%s: %s" 
 }
@@ -220,7 +221,7 @@ results[MTLM]=`grep "Link Maintained" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/
 results[MLLD]=`grep "Length x Days" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
 results[MTFH]=`grep "Field Held" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
 results[LFMD]=`grep "Largest Field" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
-
+results[MODDEP]=`grep "Mods Deployed" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
 
 echoStatsJson
 
