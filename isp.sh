@@ -22,7 +22,7 @@
 # experimental use only!
 
 function extractBox {
-BOX=`grep -o "<span class='ocrx_word'[^>]*>$1</span>" stdout.html`
+BOX=`grep -io "<span class='ocrx_word'[^>]*>$1</span>" stdout.html`
 AT1=`echo $BOX | sed -E "s/.*bbox ([0-9]*) ([0-9]*) ([0-9]*) ([0-9]*).*/\1/"`
 AT2=`echo $BOX | sed -E "s/.*bbox ([0-9]*) ([0-9]*) ([0-9]*) ([0-9]*).*/\2/"`
 AT3=`echo $BOX | sed -E "s/.*bbox ([0-9]*) ([0-9]*) ([0-9]*) ([0-9]*).*/\3/"`
