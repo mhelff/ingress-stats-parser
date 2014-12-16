@@ -98,6 +98,65 @@ fi
 echo $OWNFOREIGN;
 }
 
+function echoStatsPlain {
+  echoStatsInternal "%s=%s"
+}
+
+function echoStatsHuman {
+hd[TYPE]="Type of stats"
+hd[OWNFOREIGN]="Own or foreign"
+hd[AGENT]="Agent"
+hd[LEVEL]="Level"
+hd[AP]="AP"
+hd[UPV]="Unique Portals Visited"
+hd[PD]="Portals discovered"
+hd[XMC]="XM Collected"
+hd[HACKS]="Hacks"
+hd[RDEPLOY]="Resonators Deployed"
+hd[LC]="Links created"
+hd[CFC]="Control Fields Created"
+hd[MUC]="Mind Units Captured"
+hd[LLEC]="Longest Link Ever Created"
+hd[LCF]="Largest Control Field"
+hd[XMR]="XM Recharged"
+hd[PC]="Portals Captured"
+hd[UPC]="Unique Portals Captured"
+hd[RDESTROY]="Resonators Destroyed"
+hd[PN]="Portals Neutralized"
+hd[ELD]="Enemy Links Destroyed"
+hd[ECFD]="Enemy Control Fields Destroyed"
+hd[DW]="Distance Walked"
+hd[MTPH]="Max Time Portal Held"
+hd[MTLM]="Max Time Link Maintained"
+hd[MLLD]="Max Link Length x Days"
+hd[MTFH]="Max Time Field Held"
+hd[LFMD]="Largest Field MUs x Days"
+
+echoStatsInternal "%s: %s" 
+}
+
+function echoStatsJson {
+echo "{ \"statsentry\": {"
+echoStatsInternal "\\\"%s\\\": \\\"%s\\\","
+echo "} }"
+}
+
+function echoStatsInternal {
+for key in "${!results[@]}"
+do
+  
+  if test "${hd[$key]+isset}"
+  then
+     KEYVAL=${hd[$key]}
+  else
+     KEYVAL=$key
+     #echo "KEYVAL: $KEYVAL" >&2
+  fi
+  OUTPUTLINE=`printf "$1" "$KEYVAL" "${results[$key]}"`
+  echo "$OUTPUTLINE"
+done
+}
+
 
 convert $1 -white-threshold 20000 orgbw.png
 tesseract orgbw.png stdout -l eng -psm 4 hocr 1> stdout.html 2>/dev/null
@@ -129,59 +188,39 @@ fi;
 # now fetch the stats
 tesseract withoutlogo.png stdout -l eng -psm 4 > stdout.txt
 
-AGENT=`extractAgentName stdout.txt`
-LEVEL=`extractAgentLevel stdout.txt`
-AP=`extractAp stdout.txt`
-OWNFOREIGN=`getOwnForeignStats stdout.txt`
-UPV=`grep "Unique Portals Visited" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
-PD=`grep "Portals Discovered" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
-XMC=`grep "XM Collected" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
-HACKS=`grep "Hacks" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
-RDEPLOY=`grep "Resonators Deployed" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
-LC=`grep "Links Created" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
-CFC=`grep "Control Fields Created" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
-MUC=`grep "Mind Units Captured" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
-LLEC=`grep "Longest Link Ever Created" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
-LCF=`grep "Largest Control Field" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
-XMR=`grep "XM Recharged" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
-PC=`grep "^Portals Captured" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
-UPC=`grep "Unique Portals Captured" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
-RDESTROY=`grep "Resonators Destroyed" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
-PN=`grep "Portals Neutralized" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
-ELD=`grep "Enemy Links Destroyed" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
-ECFD=`grep "Enemy Control Fields Destroyed" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
-DW=`grep "Distance Walked" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
-MTPH=`grep "Portal Held" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
-MTLM=`grep "Link Maintained" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
-MLLD=`grep "Length x Days" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
-MTFH=`grep "Field Held" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
-LFMD=`grep "Largest Field" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
+declare -A results
+declare -A hd
 
-echo "Type of stats: $TYPE"
-echo "Own or foreign: $OWNFOREIGN"
-echo "Agent: $AGENT"
-echo "Level: $LEVEL"
-echo "AP: $AP"
-echo "Unique Portals Visited: $UPV"
-echo "Portals discovered: $PD"
-echo "XM Collected: $XMC"
-echo "Hacks: $HACKS"
-echo "Resonators Deployed: $RDEPLOY"
-echo "Links created: $LC"
-echo "Control Fields Created: $CFC"
-echo "Mind Units Captured: $MUC"
-echo "Longest Link Ever Created: $LLEC"
-echo "Largest Control Field: $LCF"
-echo "XM Recharged: $XMR"
-echo "Portals Captured: $PC"
-echo "Unique Portals Captured: $UPC"
-echo "Resonators Destroyed: $RDESTROY"
-echo "Portals Neutralized: $PN"
-echo "Enemy Links Destroyed: $ELD"
-echo "Enemy Control Fields Destroyed: $ECFD"
-echo "Distance Walked: $DW"
-echo "Max Time Portal Held: $MTPH"
-echo "Max Time Link Maintained: $MTLM"
-echo "Max Link Length x Days: $MLLD"
-echo "Max Time Field Held: $MTFH"
-echo "Largest Field MUs x Days: $LFMD"
+results[TYPE]=$TYPE
+results[IMAGE]=$1
+results[AGENT]=`extractAgentName stdout.txt`
+results[LEVEL]=`extractAgentLevel stdout.txt`
+results[AP]=`extractAp stdout.txt`
+results[OWNFOREIGN]=`getOwnForeignStats stdout.txt`
+results[UPV]=`grep "Unique Portals Visited" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
+results[PD]=`grep "Portals Discovered" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
+results[XMC]=`grep "XM Collected" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
+results[HACKS]=`grep "Hacks" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
+results[RDEPLOY]=`grep "Resonators Deployed" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
+results[LC]=`grep "Links Created" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
+results[CFC]=`grep "Control Fields Created" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
+results[MUC]=`grep "Mind Units Captured" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
+results[LLEC]=`grep "Longest Link Ever Created" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
+results[LCF]=`grep "Largest Control Field" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
+results[XMR]=`grep "XM Recharged" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
+results[PC]=`grep "^Portals Captured" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
+results[UPC]=`grep "Unique Portals Captured" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
+results[RDESTROY]=`grep "Resonators Destroyed" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
+results[PN]=`grep "Portals Neutralized" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
+results[ELD]=`grep "Enemy Links Destroyed" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
+results[ECFD]=`grep "Enemy Control Fields Destroyed" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
+results[DW]=`grep "Distance Walked" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
+results[MTPH]=`grep "Portal Held" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
+results[MTLM]=`grep "Link Maintained" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
+results[MLLD]=`grep "Length x Days" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
+results[MTFH]=`grep "Field Held" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
+results[LFMD]=`grep "Largest Field" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
+
+
+echoStatsJson
+
