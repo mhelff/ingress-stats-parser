@@ -4,7 +4,7 @@ ingress-stats-parser
 Script for OCR parsing of Ingress agent statistics screenshots
 
 ### Status
-This project is in a early experimental status.
+This project is in a early experimental status. Parsing of stats already looks fairly reliable, but needs more testing. See Testing on how to test and help.
 
 ### WTF?
 This script is inspired by the fantastic agent-stats.com project.
@@ -22,11 +22,16 @@ Be aware that this version is only tested on Ubuntu 14.04.
 * ImageMagick
 * tesseract-ocr
 
+### Testing
+Basic test data is provided in the ingress-stats-parser-testdata repository. Clone a copy into your working copy of ingress-stats-parser. Use test.sh to validate the known results to your changes you applied to isp.sh.
+
+Submitting more validated test files to ingress-stats-parser-testdata is highly appreciated!
+
 ### ToDo
 
 * Output formatting (json/xml/...)
 * Cleanup of temp files
 * Medal recognition
-* Automated tests
+* Add command line options...
 * ... your ideas
 

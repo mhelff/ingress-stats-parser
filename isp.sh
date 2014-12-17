@@ -223,5 +223,6 @@ results[MTFH]=`grep "Field Held" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | s
 results[LFMD]=`grep "Largest Field" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
 results[MODDEP]=`grep "Mods Deployed" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
 
-echoStatsJson
-
+#echoStatsJson
+#echoStatsHuman
+echoStatsPlain
