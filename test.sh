@@ -1,5 +1,5 @@
 #!/bin/bash
-FILES=test/*.tst
+FILES=ingress-stats-parser-testdata/*.tst
 for f in $FILES
 do
   echo "Processing $f file..."
@@ -20,7 +20,7 @@ do
   do
     pair=(${line//=/ })
     ispresult[${pair[0]}]=${pair[1]}
-  done < <(./isp.sh test/${IMG}) 
+  done < <(./isp.sh ingress-stats-parser-testdata/${IMG}) 
   
   for key in "${!expected[@]}"
   do
