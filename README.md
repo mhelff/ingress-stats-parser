@@ -18,7 +18,7 @@ Be aware that this version is only tested on Ubuntu 14.04.
 
 ### Requirements
 
-* Bash
+* Bash 4
 * ImageMagick
 * tesseract-ocr
 
@@ -29,9 +29,9 @@ Submitting more validated test files to ingress-stats-parser-testdata is highly 
 
 ### ToDo
 
-* Output formatting (json/xml/...)
+* Commandline options for output formatting (json/xml/...)
 * Cleanup of temp files
 * Medal recognition
-* Add command line options...
+* dependency checks
 * ... your ideas
 
