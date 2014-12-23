@@ -29,7 +29,6 @@ Submitting more validated test files to ingress-stats-parser-testdata is highly 
 
 ### ToDo
 
-* Commandline options for output formatting (json/xml/...)
 * Cleanup of temp files
 * Medal recognition
 * dependency checks
