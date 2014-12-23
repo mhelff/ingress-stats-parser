@@ -158,6 +158,17 @@ do
 done
 }
 
+function show_help {
+   echo "Ingress stats parser"
+   echo
+   echo "Usage: isp.sh [options...] imagefile"
+   echo
+   echo "Options:"
+   echo "-f plain|json|human   output format selection"
+   echo "-h                    show this help message"
+}
+
+function doOCR {
 
 convert $1 -white-threshold 20000 orgbw.png
 tesseract orgbw.png stdout -l eng -psm 4 hocr 1> stdout.html 2>/dev/null
@@ -168,7 +179,7 @@ M1=`extractBox ALL[TIME]* b1.png b1.txt $1`
 M2=`extractBox MONTH b2.png b2.txt $1`
 M3=`extractBox WEEK b3.png b3.txt $1`
 M4=`extractBox NOW b4.png b4.txt $1`
-#echo $M1 $M2 $M3 $M4
+
 if [ $M1 \> $M2 ] && [ $M1 \> $M3 ] &&  [ $M1 \> $M4 ];
 then
 TYPE="ALLTIME";
@@ -188,9 +199,6 @@ fi;
 
 # now fetch the stats
 tesseract withoutlogo.png stdout -l eng -psm 4 > stdout.txt
-
-declare -A results
-declare -A hd
 
 results[TYPE]=$TYPE
 results[IMAGE]=$1
@@ -223,6 +231,40 @@ results[MTFH]=`grep "Field Held" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | s
 results[LFMD]=`grep "Largest Field" stdout.txt | sed -E "s/.* ([0-9,]*) .*/\1/" | sed "s/,//g"`
 results[MODDEP]=`grep "Mods Deployed" stdout.txt | sed -E "s/.* ([0-9,]*)/\1/" | sed "s/,//g"`
 
+}
+
+declare -A results
+declare -A hd
+output_format="human"
+
+if [ $# -eq 0 ]
+then
+   show_help
+   exit 0
+fi
+
+while getopts "hf:" opt; do
+    case "$opt" in
+     h) show_help
+        exit 0
+        ;;
+    f)  output_format=$OPTARG
+        ;;
+    esac
+done
+
+shift $((OPTIND-1))
+
+doOCR $1
+
+case "$output_format" in
+    plain) echoStatsPlain
+        ;;
+    json) echoStatsJson
+        ;;
+    human) echoStatsHuman
+        ;;esac
+
 #echoStatsJson
 #echoStatsHuman
-echoStatsPlain
+#echoStatsPlain
